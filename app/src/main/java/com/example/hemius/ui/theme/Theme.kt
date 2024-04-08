@@ -7,35 +7,17 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.example.hemius.HemiusColors
 
 private val DarkColorScheme = darkColorScheme(
-//    primary = WhiteFont,
-//    secondary = WhiteSecondFont,
-    primary = Color.Red,
-    secondary = Color.Red,
-    tertiary = Color.Red,
-    background = Color.Red,
-    surface = Color.Red,
-    onPrimary = Color.Red,
-    onSecondary  = Color.Red,
-    onTertiary  = Color.Red,
-    onBackground  = Color.Red,
-    onSurface   = Color.Red,
+    background = BlackBackground,
+    surface = BlackBackground
 )
 
 private val LightColorScheme = lightColorScheme(
-//    primary = BlackFont,
-//    secondary = BlackSecondFont,
-    primary = Color.Red,
-    onPrimary = Color.Yellow,
-    secondary = Color.Blue,
-    onSecondary = Color.Cyan,
-    background  = Color.Magenta,
-    onBackground  = Color.LightGray,
-
-
+    background = WhiteBackground,
+    surface = WhiteBackground
 )
 
 @Immutable
@@ -89,6 +71,10 @@ val DarkColors = Colors(
     select = SelectBackgroundDark
 )
 
+val HemiusColors = compositionLocalOf<Colors> {
+    error("No Colors provided")
+}
+
 @Composable
 fun HemiusTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -108,8 +94,8 @@ fun HemiusTheme(
 
     CompositionLocalProvider(HemiusColors provides colors) {
         MaterialTheme(
-            colorScheme = colorScheme ,
-            typography = Typography ,
+            colorScheme = colorScheme,
+            typography = Typography,
             content = content
         )
     }

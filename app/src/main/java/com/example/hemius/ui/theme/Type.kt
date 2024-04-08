@@ -23,11 +23,20 @@ val Typography = Typography(
     bodyMedium = TextStyle(
         fontFamily = GeologicaFont,
         fontWeight = FontWeight.Normal,
+        fontSize = 22.sp,
         lineHeight = 28.sp,
+        letterSpacing = 0.sp,
         platformStyle = PlatformTextStyle(spanStyle = PlatformSpanStyle() , paragraphStyle = PlatformParagraphStyle(includeFontPadding = false)),
         lineHeightStyle = LineHeightStyle(alignment = LineHeightStyle.Alignment(topRatio = 1f), trim = LineHeightStyle.Trim.Both),
-        fontSize = 22.sp,
-        letterSpacing = 0.sp
+    ) ,
+    labelSmall = TextStyle(
+        fontFamily = GeologicaFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.sp,
+        platformStyle = PlatformTextStyle(spanStyle = PlatformSpanStyle() , paragraphStyle = PlatformParagraphStyle(includeFontPadding = false)),
+        lineHeightStyle = LineHeightStyle(alignment = LineHeightStyle.Alignment(topRatio = 1f), trim = LineHeightStyle.Trim.Both),
     )
     /* Other default text styles to override
     titleLarge = TextStyle(
