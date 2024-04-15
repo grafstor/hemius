@@ -60,7 +60,9 @@ fun TextButton(
 
 @Composable
 fun PhotoButton(
-    onClick : () -> Unit = {}
+    onClick : () -> Unit = {},
+    iconId : Int,
+    color : Color,
 ) {
     Box(
         modifier = Modifier
@@ -78,8 +80,8 @@ fun PhotoButton(
                     .padding(19.5.dp),
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_photo), // Здесь используется ваш ресурс SVG
-                    tint = HemiusColors.current.blueFirst,
+                    painter = painterResource(iconId), // Здесь используется ваш ресурс SVG
+                    tint = color,
                     contentDescription = "Photo Icon"
                 )
             }

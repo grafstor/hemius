@@ -82,7 +82,6 @@ fun HemiusTheme(
 ) {
     val colorScheme = if (isDarkTheme) {
         DarkColorScheme
-
     } else {
         LightColorScheme
     }

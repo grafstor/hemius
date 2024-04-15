@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.example.hemius.components
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,19 +21,23 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.hemius.ui.theme.HemiusColors
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Thing (
+fun ThingBox (
     id : Int,
     onItemClick: (Int) -> Unit,
     onItemPress: (Int) -> Unit,
     text : String = "Название вещи",
     selectedIds : List<Int>,
-    imageId: Int,
+    image: ImageBitmap,
 ) {
     var isSelected = selectedIds.contains(id)
     Column (
@@ -50,10 +57,12 @@ fun Thing (
     ) {
         Image(
             modifier = Modifier
-                .padding(start = 9.dp, top = 9.dp, end = 9.dp)
-                .size(120.dp),
-            painter = painterResource(id = imageId),
-            contentDescription = "Photo Icon"
+                .padding(start = 9.dp, top = 9.dp, end = 9.dp),
+//                .background(Color.Red)
+//            painter = image,
+//            image = image,
+            bitmap = image,
+            contentDescription = null,
         )
         Text(
             modifier = Modifier
@@ -65,10 +74,3 @@ fun Thing (
         )
     }
 }
-
-@Immutable
-data class TestThing(
-    val name: String,
-    val description: String,
-    val imageId: Int,
-)

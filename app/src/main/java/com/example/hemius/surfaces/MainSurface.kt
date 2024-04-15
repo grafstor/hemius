@@ -23,16 +23,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.room.RoomDatabase
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
+
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.room.Room
+
 
 import com.example.hemius.components.BottomMenu
 import com.example.hemius.components.FoldersMenu
 import com.example.hemius.components.TopMenu
 import com.example.hemius.components.TopMenuFolderOptions
 import com.example.hemius.components.TopMenuOptions
+import com.example.hemius.database.events.ThingEvent
+import com.example.hemius.database.states.ThingState
+import com.example.hemius.database.vm.ThingViewModel
 import com.example.hemius.ui.theme.HemiusColors
+
 
 @Composable
 fun MainSurface (
+
     onArchiveClick : () -> Unit = {},
     onSearchClick : () -> Unit = {},
 
@@ -43,10 +62,15 @@ fun MainSurface (
     onHomeClick : () -> Unit = {},
     onFoldersClick : () -> Unit = {},
     onSettingsClick : () -> Unit = {},
+    onCameraClick : () -> Unit = {},
 
     onFromFolderDeleteClick : () -> Unit = {},
     onModeToFolderClick : () -> Unit = {},
+
+    state: ThingState,
+    onEvent: (ThingEvent) -> Unit,
 ){
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -72,6 +96,7 @@ fun MainSurface (
             var selectedItem by remember { mutableStateOf<String?>("Все") }
 
             val onItemClick: (String) -> Unit = { selectedFolder ->
+//                onEvent(ThingEvent.SelectFlder(selectedFolder))
                 selectedItem = selectedFolder
             }
             Surface(
@@ -79,7 +104,7 @@ fun MainSurface (
                     .background(HemiusColors.current.background)
             ){
                 AnimatedVisibility(
-                    visible = !isThingSelected,
+                    visible = !state.isThingSelected,
                     enter = slideInVertically(initialOffsetY = { -it }, animationSpec = animationSpec),
                     exit = slideOutVertically(targetOffsetY = { -it }, animationSpec = animationSpec)
                 ) {
@@ -89,7 +114,7 @@ fun MainSurface (
                     )
                 }
                 AnimatedVisibility(
-                    visible = isThingSelected,
+                    visible = state.isThingSelected,
                     enter = slideInVertically(initialOffsetY = { it }, animationSpec = animationSpec),
                     exit = slideOutVertically(targetOffsetY = { it }, animationSpec = animationSpec)
                 ) {
@@ -108,7 +133,7 @@ fun MainSurface (
                 }
             }
             AnimatedVisibility(
-                visible = !isThingSelected,
+                visible = !state.isThingSelected,
                 enter = expandVertically(expandFrom = Alignment.Top, animationSpec = animationSpecIntSize),
                 exit = shrinkVertically(shrinkTowards = Alignment.Top,animationSpec = animationSpecIntSize)
             ) {
@@ -119,7 +144,9 @@ fun MainSurface (
                 )
             }
             ThingsSurface(
-                onSelectUpdate = {update -> isThingSelected = update}
+                state = state,
+                onEvent = onEvent,
+                things = state.things
             )
         }
 
@@ -128,6 +155,7 @@ fun MainSurface (
                 onHomeClick = onHomeClick,
                 onSettingsClick = onSettingsClick,
                 onFoldersClick = onFoldersClick,
+                onCameraClick = onCameraClick,
             )
         }
     }

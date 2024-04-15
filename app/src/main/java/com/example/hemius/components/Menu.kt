@@ -102,13 +102,41 @@ fun TopMenu(
 }
 
 @Composable
+fun TopMenuSearch(
+    onSearchClick : () -> Unit = {},
+) {
+    Box (modifier = Modifier
+        .height(87.dp)
+        .wrapContentSize(Alignment.BottomStart)
+    ) {
+        Row(
+            modifier = Modifier
+                .height(87.dp)
+                .fillMaxWidth()
+                .background(HemiusColors.current.background)
+                .padding(horizontal = 18.dp, vertical = 0.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+
+            MenuButton(svgId = R.drawable.ic_search, onItemClick = onSearchClick)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .align(Alignment.BottomStart)
+                .background(color = HemiusColors.current.lines)
+        )
+    }
+}
+
+@Composable
 fun TopMenuBack(
     onBackClick : () -> Unit = {},
 ) {
     Box (modifier = Modifier
         .height(87.dp)
         .wrapContentSize(Alignment.BottomStart)
-//        .background(Color.Green)
     ) {
         Row(
             modifier = Modifier
@@ -271,6 +299,7 @@ fun BottomMenu(
     onHomeClick : () -> Unit = {},
     onSettingsClick : () -> Unit = {},
     onFoldersClick : () -> Unit = {},
+    onCameraClick : () -> Unit = {},
 ) {
     val animationSpec = tween<IntSize>(
         durationMillis = 200,
@@ -315,7 +344,11 @@ fun BottomMenu(
                             Alignment.CenterVertically
                         ),
                 ) {
-                    PhotoButton()
+                    PhotoButton(
+                        onClick = onCameraClick,
+                        iconId = R.drawable.ic_photo,
+                        color = HemiusColors.current.blueFirst,
+                    )
                 }
                 MenuButton(
                     svgId = R.drawable.ic_menu,
