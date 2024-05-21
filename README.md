@@ -17,7 +17,7 @@ An app that helps you organize, track, and manage your collection of valuable it
 Hemius is designed to help you efficiently manage and keep track of your valuable items. Whether it's a collection of rare books, antiques, or any other valuable items, Hemius provides an intuitive and user-friendly interface for cataloging and managing your collection.
 
 ## Screenshots
-![Screenshots 1](https://github.com/grafstor/hemius/assets/48201603/c0540d3f-41f9-43b5-8121-dd43d8ae6560)
+![Frame 515](https://github.com/grafstor/hemius/assets/48201603/86551121-840f-4396-a77e-0299763bedb3)
 
 ## Built With
 - **Kotlin**: The primary language used for development.
