@@ -27,14 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.hemius.R
+import com.example.hemius.database.entities.Folder
 import com.example.hemius.ui.theme.HemiusColors
 
 
 @Composable
 fun FoldersMenu(
-    folders: List<String>,
-    selectedItem: String?,
-    onItemClick: (String) -> Unit
+    folders: List<Folder>,
+    selectedFolderId: Int,
+    onFolderSelected: (Int) -> Unit
 ) {
     Box {
         val scrollState = rememberScrollState()
@@ -49,7 +50,7 @@ fun FoldersMenu(
             horizontalArrangement = Arrangement.spacedBy(9.dp) ,
         ) {
             folders.forEach { folder ->
-                val isSelected = folder == selectedItem
+                val isSelected = selectedFolderId == folder.id
                 Box(
                     modifier = Modifier
                         .height(87.dp)
@@ -59,9 +60,9 @@ fun FoldersMenu(
                         ) ,
                 ) {
                     TextButton(
-                        text = folder ,
+                        text = folder.name,
                         fontColor = if (isSelected) HemiusColors.current.blueFirst else HemiusColors.current.font,
-                        onClick = { onItemClick(folder) }
+                        onClick = { onFolderSelected(folder.id) }
                     )
                 }
             }
@@ -78,7 +79,6 @@ fun TopMenu(
     Box (modifier = Modifier
         .height(87.dp)
         .wrapContentSize(Alignment.BottomStart)
-//        .background(Color.Green)
     ) {
         Row(
             modifier = Modifier
@@ -365,5 +365,28 @@ fun BottomMenu(
                 .align(Alignment.TopEnd)
                 .background(color = HemiusColors.current.lines)
         )
+    }
+}
+
+
+@Composable
+fun TopThingOptions(
+    onOptionsClick : () -> Unit = {},
+) {
+    Box (modifier = Modifier
+        .height(87.dp)
+        .wrapContentSize(Alignment.BottomStart)
+    ) {
+        Row(
+            modifier = Modifier
+                .height(87.dp)
+                .fillMaxWidth()
+                .background(HemiusColors.current.background)
+                .padding(horizontal = 18.dp, vertical = 0.dp),
+            horizontalArrangement = Arrangement.End,
+        ) {
+
+            MenuButton(svgId = R.drawable.ic_options, onItemClick = onOptionsClick)
+        }
     }
 }

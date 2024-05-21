@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.example.hemius.components.BottomMenu
 import com.example.hemius.components.TextButton
 import com.example.hemius.components.TopMenuBack
+import com.example.hemius.database.events.ThingEvent
+import com.example.hemius.database.states.ThingState
 import com.example.hemius.ui.theme.HemiusColors
 
 @Composable
@@ -34,7 +36,11 @@ fun SettingsSurface(
 
     onHomeClick : () -> Unit = {},
     onFoldersClick : () -> Unit = {},
-    onSettingsClick : () -> Unit = {}
+    onSettingsClick : () -> Unit = {},
+    onCameraClick : () -> Unit = {},
+
+    state: ThingState,
+    onEvent: (ThingEvent) -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -83,14 +89,14 @@ fun SettingsSurface(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
-                            .clickable(onClick = { }),
+                            .clickable(onClick = { onEvent(ThingEvent.ToggleDarkTheme(false)) }),
                     ) {
                         Text(
                             modifier = Modifier
                                 .padding(top = 19.5.dp, bottom = 19.5.dp)
                                 .height(35.dp),
                             text = "Светлая",
-                            color = HemiusColors.current.font,
+                            color = if (!state.isDarkTheme) HemiusColors.current.blueFirst else HemiusColors.current.font,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
@@ -98,14 +104,14 @@ fun SettingsSurface(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
-                            .clickable(onClick = { }),
+                            .clickable(onClick = { onEvent(ThingEvent.ToggleDarkTheme(true))  }),
                     ) {
                         Text(
                             modifier = Modifier
                                 .padding(top = 19.5.dp, bottom = 19.5.dp)
                                 .height(35.dp),
                             text = "Тёмная",
-                            color = HemiusColors.current.font,
+                            color = if (state.isDarkTheme) HemiusColors.current.blueFirst else HemiusColors.current.font,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
@@ -135,6 +141,7 @@ fun SettingsSurface(
                 onHomeClick = onHomeClick,
                 onSettingsClick = onSettingsClick,
                 onFoldersClick = onFoldersClick,
+                onCameraClick = onCameraClick,
             )
         }
     }

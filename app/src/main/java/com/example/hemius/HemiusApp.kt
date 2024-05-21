@@ -18,7 +18,10 @@ fun HemiusApp (
     onEvent: (ThingEvent) -> Unit,
     applicationContext : Context,
 ){
-    HemiusTheme {
+    HemiusTheme (
+        state = state,
+        onEvent = onEvent,
+    ) {
         val navController = rememberNavController()
         NavGraph(
             state = state,

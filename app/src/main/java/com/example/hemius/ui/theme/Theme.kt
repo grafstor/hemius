@@ -9,6 +9,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.example.hemius.database.events.ThingEvent
+import com.example.hemius.database.states.ThingState
 
 private val DarkColorScheme = darkColorScheme(
     background = BlackBackground,
@@ -77,15 +79,17 @@ val HemiusColors = compositionLocalOf<Colors> {
 
 @Composable
 fun HemiusTheme(
+    state: ThingState,
+    onEvent: (ThingEvent) -> Unit,
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (isDarkTheme) {
+    val colorScheme = if (state.isDarkTheme) {
         DarkColorScheme
     } else {
         LightColorScheme
     }
-    val colors = if (isDarkTheme) {
+    val colors = if (state.isDarkTheme) {
         DarkColors
     } else {
         LightColors

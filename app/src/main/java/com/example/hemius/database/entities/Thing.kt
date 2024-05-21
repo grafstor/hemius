@@ -4,9 +4,15 @@ import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(foreignKeys = [ForeignKey(
+    entity = Folder::class,
+    parentColumns = ["id"],
+    childColumns = ["folderId"],
+    onDelete = ForeignKey.CASCADE
+)])
 data class Thing(
     @ColumnInfo(name = "name")
     val name: String? = null,
@@ -17,9 +23,12 @@ data class Thing(
     @ColumnInfo(name = "is_archived")
     val isArchived: Boolean = false,
 
-    @ColumnInfo(name = "image", typeAffinity = ColumnInfo.BLOB)
-    var image: Bitmap? = null,
+    @ColumnInfo(name = "folderId", index = true)
+    val folderId: Int? = null,
 
     @PrimaryKey(autoGenerate = true)
-    val uid: Int = 0
+    val uid: Int = 0,
+
+    @ColumnInfo(name = "image_path")
+    val imagePath: String? = null,
 )

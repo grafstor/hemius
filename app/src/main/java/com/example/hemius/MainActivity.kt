@@ -4,7 +4,9 @@ package com.example.hemius
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -23,9 +25,34 @@ import androidx.room.Room
 
 import com.example.hemius.database.HemiusDatabase
 import com.example.hemius.database.vm.ThingViewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+
 
 
 class MainActivity : ComponentActivity() {
+
+//    private val db by lazy {
+//        Room.databaseBuilder(
+//            applicationContext,
+//            HemiusDatabase::class.java,
+//            "hemius.db"
+//        )
+////            .allowMainThreadQueries()
+//            .fallbackToDestructiveMigration()
+//            .build()
+//    }
+//
+//    private val viewModel by viewModels<ThingViewModel>(
+//        factoryProducer = {
+//            object : ViewModelProvider.Factory {
+//                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//                    return ThingViewModel(db.thingDao, db.folderDao, db.settingsDao) as T
+//                }
+//            }
+//        }
+//    )
 
     private val db by lazy {
         Room.databaseBuilder(
@@ -33,7 +60,8 @@ class MainActivity : ComponentActivity() {
             HemiusDatabase::class.java,
             "hemius.db"
         )
-//            .allowMainThreadQueries()
+//            .allowMainThreadQueries() // Avoid allowing main thread queries
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -41,12 +69,30 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ThingViewModel(db.thingDao) as T
+                    return ThingViewModel(db.thingDao, db.folderDao, db.settingsDao, applicationContext) as T
                 }
             }
         }
     )
 
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        if (!hasRequiredPermissions()) {
+//            ActivityCompat.requestPermissions(
+//                this, CAMERAX_PERMISSIONS, 0
+//            )
+//        }
+//        setContent {
+//            val state by viewModel.state.collectAsState()
+//            val onEvent = viewModel::onEvent
+//            HemiusApp(
+//                state=state,
+//                onEvent = onEvent,
+//                finishActivity = { finish() },
+//                applicationContext=applicationContext
+//            )
+//        }
+//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!hasRequiredPermissions()) {
@@ -58,10 +104,10 @@ class MainActivity : ComponentActivity() {
             val state by viewModel.state.collectAsState()
             val onEvent = viewModel::onEvent
             HemiusApp(
-                state=state,
+                state = state,
                 onEvent = onEvent,
                 finishActivity = { finish() },
-                applicationContext=applicationContext
+                applicationContext = applicationContext
             )
         }
     }

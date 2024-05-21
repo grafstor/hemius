@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,16 +34,21 @@ import com.example.hemius.ui.theme.HemiusColors
 
 @Composable
 fun ArchiveSurface(
+    onThingOpenClick : () -> Unit = {},
+
     onBackClick : () -> Unit,
 
     onHomeClick : () -> Unit = {},
     onFoldersClick : () -> Unit = {},
     onSettingsClick : () -> Unit = {},
+    onCameraClick : () -> Unit = {},
 
     state: ThingState,
     onEvent: (ThingEvent) -> Unit,
 ) {
-
+    LaunchedEffect(Unit) {
+        onEvent(ThingEvent.ToggleArchive(true))
+    }
 
     Surface(
         modifier = Modifier
@@ -58,11 +64,14 @@ fun ArchiveSurface(
             TopMenuBack(
                 onBackClick = onBackClick
             )
-            ThingsSurface(
-                things = state.archivedThings,
-                state = state,
-                onEvent = onEvent
-            )
+            if (state.archivedFilter){
+                ThingsSurface(
+                    onThingOpenClick = onThingOpenClick,
+                    things = state.things,
+                    state = state,
+                    onEvent = onEvent
+                )
+            }
         }
 
         Column (modifier = Modifier.wrapContentSize(Alignment.BottomStart)) {
@@ -70,6 +79,7 @@ fun ArchiveSurface(
                 onHomeClick = onHomeClick,
                 onSettingsClick = onSettingsClick,
                 onFoldersClick = onFoldersClick,
+                onCameraClick = onCameraClick,
             )
         }
     }

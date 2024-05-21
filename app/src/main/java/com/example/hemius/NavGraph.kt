@@ -13,11 +13,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.hemius.database.events.ThingEvent
 import com.example.hemius.database.states.ThingState
+import com.example.hemius.surfaces.AddToFolderSurface
 import com.example.hemius.surfaces.ArchiveSurface
 import com.example.hemius.surfaces.CameraSurface
 import com.example.hemius.surfaces.CreateThingSurface
 import com.example.hemius.surfaces.FoldersSurface
 import com.example.hemius.surfaces.MainSurface
+import com.example.hemius.surfaces.ScrollThingSurface
 import com.example.hemius.surfaces.SearchSurface
 import com.example.hemius.surfaces.SettingsSurface
 
@@ -40,10 +42,12 @@ fun NavGraph(
         navigation(startDestination = "home", route = "main") {
             composable("home") {
                 MainSurface(
+                    onThingOpenClick = { navController.navigate("scrollthing")  },
+
                     onArchiveClick = { navController.navigate("archive") },
                     onSearchClick = { navController.navigate("search") },
 
-                    onToFolderClick = {},
+                    onToFolderClick = { navController.navigate("addtofolder") },
                     onDeleteClick = { onEvent(ThingEvent.DeleteSelected) },
                     onToArchiveClick = { onEvent(ThingEvent.ArchiveSelected) },
 
@@ -52,8 +56,12 @@ fun NavGraph(
                     onSettingsClick = { navController.navigate("settings") },
                     onCameraClick = { navController.navigate("camera") },
 
-                    onFromFolderDeleteClick = {},
-                    onModeToFolderClick = {},
+                    onFromFolderDeleteClick = { onEvent(ThingEvent.DeleteFromFolderSelected) },
+                    onModeToFolderClick = {
+                        onEvent(ThingEvent.ToggleToFolderMoving(true))
+                        navController.navigate("addtofolder")
+                                          },
+
                     state = state,
                     onEvent = onEvent,
                 )
@@ -72,6 +80,10 @@ fun NavGraph(
                     },
                     onFoldersClick = { navController.navigate("folders") },
                     onSettingsClick = { navController.navigate("settings") },
+                    onCameraClick = { navController.navigate("camera") },
+
+                    state = state,
+                    onEvent = onEvent,
                 )
             }
             composable("search") {
@@ -80,6 +92,7 @@ fun NavGraph(
             }
             composable("archive") {
                 ArchiveSurface(
+                    onThingOpenClick = { navController.navigate("scrollthing")  },
                     onBackClick = {
                         navController.navigate("home"){
                             popUpTo("home") { inclusive = true }
@@ -92,6 +105,7 @@ fun NavGraph(
                     },
                     onFoldersClick = { navController.navigate("folders") },
                     onSettingsClick = { navController.navigate("settings") },
+                    onCameraClick = { navController.navigate("camera") },
                     state = state,
                     onEvent = onEvent,
                 )
@@ -110,6 +124,9 @@ fun NavGraph(
                     },
                     onFoldersClick = { navController.navigate("folders") },
                     onSettingsClick = { navController.navigate("settings") },
+                    onCameraClick = { navController.navigate("camera") },
+                    state = state,
+                    onEvent = onEvent,
                 )
             }
             composable("camera") {
@@ -139,6 +156,37 @@ fun NavGraph(
                             popUpTo("camera") { inclusive = true }
                         }
                     },
+                    state = state,
+                    onEvent = onEvent,
+                )
+            }
+            composable("scrollthing") {
+                ScrollThingSurface(
+                    onToFolderClick = { navController.navigate("folders") },
+                    onDeleteClick = { onEvent(ThingEvent.DeleteSelected) },
+                    onToArchiveClick = { onEvent(ThingEvent.ArchiveSelected) },
+
+                    state = state,
+                    onEvent = onEvent,
+
+                )
+            }
+            composable("addtofolder") {
+                AddToFolderSurface(
+                    onBackClick = {
+                        navController.navigate("home"){
+                            popUpTo("home") { inclusive = true }
+                        }
+                    },
+                    onHomeClick = {
+                        navController.navigate("home"){
+                            popUpTo("home") { inclusive = true }
+                        }
+                    },
+                    onFoldersClick = { navController.navigate("folders") },
+                    onSettingsClick = { navController.navigate("settings") },
+                    onCameraClick = { navController.navigate("camera") },
+
                     state = state,
                     onEvent = onEvent,
                 )

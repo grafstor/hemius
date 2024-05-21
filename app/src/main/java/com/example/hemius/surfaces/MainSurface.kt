@@ -31,6 +31,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import com.example.hemius.components.FoldersMenu
 import com.example.hemius.components.TopMenu
 import com.example.hemius.components.TopMenuFolderOptions
 import com.example.hemius.components.TopMenuOptions
+import com.example.hemius.database.entities.Folder
 import com.example.hemius.database.events.ThingEvent
 import com.example.hemius.database.states.ThingState
 import com.example.hemius.database.vm.ThingViewModel
@@ -51,6 +53,7 @@ import com.example.hemius.ui.theme.HemiusColors
 
 @Composable
 fun MainSurface (
+    onThingOpenClick : () -> Unit = {},
 
     onArchiveClick : () -> Unit = {},
     onSearchClick : () -> Unit = {},
@@ -71,6 +74,9 @@ fun MainSurface (
     onEvent: (ThingEvent) -> Unit,
 ){
 
+    LaunchedEffect(Unit) {
+        onEvent(ThingEvent.ToggleArchive(false))
+    }
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -89,16 +95,6 @@ fun MainSurface (
                 durationMillis = 300,
                 easing = FastOutSlowInEasing
             )
-
-            val folders = listOf("Все", "Игрушки", "Важное")
-
-            var isThingSelected by remember { mutableStateOf<Boolean>(false) }
-            var selectedItem by remember { mutableStateOf<String?>("Все") }
-
-            val onItemClick: (String) -> Unit = { selectedFolder ->
-//                onEvent(ThingEvent.SelectFlder(selectedFolder))
-                selectedItem = selectedFolder
-            }
             Surface(
                 modifier = Modifier
                     .background(HemiusColors.current.background)
@@ -118,7 +114,7 @@ fun MainSurface (
                     enter = slideInVertically(initialOffsetY = { it }, animationSpec = animationSpec),
                     exit = slideOutVertically(targetOffsetY = { it }, animationSpec = animationSpec)
                 ) {
-                    if (selectedItem == "Все") {
+                    if (state.selectedFolderId == -1) {
                         TopMenuOptions(
                             onToFolderClick = onToFolderClick,
                             onDeleteClick = onDeleteClick,
@@ -138,12 +134,13 @@ fun MainSurface (
                 exit = shrinkVertically(shrinkTowards = Alignment.Top,animationSpec = animationSpecIntSize)
             ) {
                 FoldersMenu(
-                    folders = folders,
-                    selectedItem = selectedItem,
-                    onItemClick = onItemClick
+                    folders = (listOf(Folder(ThingViewModel.ALL_FOLDERS_ID, "Все")) + state.folders.map { it.first }),
+                    selectedFolderId  = state.selectedFolderId,
+                    onFolderSelected = { folderId -> onEvent(ThingEvent.SelectFolder(folderId)) }
                 )
             }
             ThingsSurface(
+                onThingOpenClick = onThingOpenClick,
                 state = state,
                 onEvent = onEvent,
                 things = state.things

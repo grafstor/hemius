@@ -7,18 +7,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -34,11 +40,15 @@ import com.example.hemius.ui.theme.HemiusColors
 @Composable
 fun ThingsSurface (
     things : List<Thing>,
+
+    onThingOpenClick : () -> Unit = {},
+
     state: ThingState,
     onEvent: (ThingEvent) -> Unit,
 ){
     DisposableEffect(Unit) {
         onDispose {
+            onEvent(ThingEvent.SaveSelected)
             onEvent(ThingEvent.DeselectSelected)
         }
     }
@@ -46,22 +56,14 @@ fun ThingsSurface (
         modifier = Modifier
             .background(HemiusColors.current.background)
     ) {
-        fun toggleItemInList(id : Int) {
-            val selectedIds = state.selectedThings.map { it.uid }
-            if (selectedIds.contains(id)) {
-                onEvent(ThingEvent.DeselectThing(state.selectedThings.find { it.uid == id }!!))
-            } else {
-                onEvent(ThingEvent.SelectThing(things.find { it.uid == id }!!))
-            }
-        }
-
-        fun onThingClick(id : Int) {
+        fun onThingClick(thing : Thing) {
             if (state.selectedThings.isNotEmpty()) {
-                toggleItemInList(id)
+                onEvent(ThingEvent.ToggleItemInList(thing))
+            }
+            else{
+                onThingOpenClick()
             }
         }
-
-        val placeholderBitmap = R.drawable.im_spinner.toBitmap()
 
         if(things.isEmpty()) {
             Box(
@@ -69,7 +71,13 @@ fun ThingsSurface (
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("There are no things yet")
+                Text(
+                    modifier = Modifier
+                        .height(20.dp),
+                    text = "Тут пока нет вещей",
+                    color = HemiusColors.current.fontSecondary,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         } else {
             LazyVerticalStaggeredGrid(
@@ -81,14 +89,18 @@ fun ThingsSurface (
                     .background(HemiusColors.current.background)
                     .fillMaxSize()
             ) {
-                items(things) {  thing ->
+                items(things, key = { it.uid }) { thing ->
+
+                    val selectedIds = state.selectedThings.map { it.uid }
+                    val isSelected = remember(selectedIds) { selectedIds.contains(thing.uid) }
+
                     ThingBox(
-                        id = thing.uid,
-                        text = thing.name!!,
-                        image = thing.image?.asImageBitmap()?: placeholderBitmap.asImageBitmap(),
-                        selectedIds = state.selectedThings.map { it.uid },
-                        onItemClick = { id -> onThingClick(id) },
-                        onItemPress = { id -> toggleItemInList(id) }
+                        thing = thing,
+                        isSelected = isSelected,
+
+                        onItemClick = { onThingClick(it) },
+                        onItemPress = { onEvent(ThingEvent.ToggleItemInList(it)) },
+                        onEvent = onEvent
                     )
                 }
             }
