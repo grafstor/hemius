@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,7 +67,6 @@ fun TextButton(
     }
 }
 
-
 @Composable
 fun FolderButton(
     folder:  Pair<Folder, List<String>>,
@@ -116,7 +116,6 @@ fun FolderButton(
         }
     }
 }
-
 
 @Composable
 fun PhotoButton(
@@ -174,6 +173,7 @@ fun MenuButton(
 @Composable
 fun TextMenuButton(
     text : String = "Текстовая Кнопка",
+    fontColor:Color = HemiusColors.current.font,
     onClick : () -> Unit = {}
 ) {
     Box(
@@ -192,7 +192,38 @@ fun TextMenuButton(
                 modifier = Modifier
                     .height(28.dp),
                 text = text,
-                color = HemiusColors.current.font,
+                color = fontColor,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+    }
+}
+
+@Composable
+fun TextOptionsButton(
+    text : String = "Текстовая Кнопка",
+    fontColor:Color = HemiusColors.current.font,
+    onClick : () -> Unit = {}
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(HemiusColors.current.background)
+            .clickable(onClick = onClick)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(19.5.dp)
+                .align(Alignment.TopCenter)
+            ,
+        ) {
+            Text(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .height(28.dp),
+                text = text,
+                color = fontColor,
                 style = MaterialTheme.typography.bodyMedium
             )
         }

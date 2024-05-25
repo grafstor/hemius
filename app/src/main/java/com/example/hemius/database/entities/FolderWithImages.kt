@@ -1,9 +1,6 @@
 package com.example.hemius.database.entities
 
 import androidx.room.DatabaseView
-import androidx.room.Embedded
-import androidx.room.Junction
-import androidx.room.Relation
 
 @DatabaseView(
     """

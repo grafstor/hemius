@@ -30,11 +30,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.room.Room
 
@@ -86,6 +88,28 @@ fun MainSurface (
         Column (modifier = Modifier
             .wrapContentSize(Alignment.TopStart)
             .background(HemiusColors.current.background)
+            .pointerInput(state) {
+                detectHorizontalDragGestures { change, dragAmount ->
+                    println(dragAmount)
+                    val folders = (listOf(Folder(ThingViewModel.ALL_FOLDERS_ID, "Все")) + state.folders.map { it.first })
+
+                    val selectedFolderIndex = folders.indexOfFirst { it.id == state.selectedFolderId }
+
+                    if (dragAmount > 40) {
+                        val previousFolder =
+                            if (selectedFolderIndex > 0) folders[selectedFolderIndex - 1] else null
+                        if (previousFolder != null) {
+                            onEvent(ThingEvent.SelectFolder(previousFolder.id))
+                        }
+                    } else if (dragAmount < -40) {
+                        val nextFolder =
+                            if (selectedFolderIndex < folders.size - 1) folders[selectedFolderIndex + 1] else null
+                        if (nextFolder != null) {
+                            onEvent(ThingEvent.SelectFolder(nextFolder.id))
+                        }
+                    }
+                }
+            }
         ) {
             val animationSpec = tween<IntOffset>(
                 durationMillis = 300,

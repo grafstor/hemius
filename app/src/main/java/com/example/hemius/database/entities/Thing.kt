@@ -1,12 +1,14 @@
 package com.example.hemius.database.entities
 
 import android.graphics.Bitmap
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
+@Immutable
 @Entity(foreignKeys = [ForeignKey(
     entity = Folder::class,
     parentColumns = ["id"],

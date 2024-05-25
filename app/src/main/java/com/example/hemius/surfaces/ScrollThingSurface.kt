@@ -1,5 +1,10 @@
 package com.example.hemius.surfaces
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -19,13 +24,18 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +45,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.example.hemius.R
 import com.example.hemius.components.ThingBox
@@ -47,9 +58,12 @@ import com.example.hemius.ui.theme.HemiusColors
 
 @Composable
 fun ScrollThingSurface (
+    onHomeClick : () -> Unit = {},
+
     onToFolderClick : () -> Unit = {},
     onDeleteClick : () -> Unit = {},
     onToArchiveClick : () -> Unit = {},
+    onToUnarchiveClick : () -> Unit = {},
 
     state: ThingState,
     onEvent: (ThingEvent) -> Unit,
@@ -62,16 +76,19 @@ fun ScrollThingSurface (
             .pointerInput(state) {
                 detectHorizontalDragGestures { change, dragAmount ->
                     println(dragAmount)
-                    val selectedThingIndex = state.things.indexOfFirst { it.uid == state.thing?.uid }
+                    val selectedThingIndex =
+                        state.things.indexOfFirst { it.uid == state.thing?.uid }
 
                     if (dragAmount > 0) {
-                        val previousThing = if (selectedThingIndex > 0) state.things[selectedThingIndex - 1] else null
-                        if (previousThing != null){
+                        val previousThing =
+                            if (selectedThingIndex > 0) state.things[selectedThingIndex - 1] else null
+                        if (previousThing != null) {
                             onEvent(ThingEvent.OpenThing(previousThing))
                         }
                     } else if (dragAmount < 0) {
-                        val nextThing = if (selectedThingIndex < state.things.size - 1) state.things[selectedThingIndex + 1] else null
-                        if (nextThing != null){
+                        val nextThing =
+                            if (selectedThingIndex < state.things.size - 1) state.things[selectedThingIndex + 1] else null
+                        if (nextThing != null) {
                             onEvent(ThingEvent.OpenThing(nextThing))
                         }
                     }
@@ -85,19 +102,35 @@ fun ScrollThingSurface (
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(25.dp),
         ) {
-            val placeholderBitmap = R.drawable.im_spinner.toBitmap()
-            TopThingOptions(
-                onOptionsClick = { }
-            )
-            if (state.thing != null){
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(state.thing.imagePath)
-                        .build(),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Inside,
-                )
 
+            TopThingOptions(
+                onHomeClick = onHomeClick,
+
+                onToFolderClick = onToFolderClick,
+                onDeleteClick = onDeleteClick,
+                onToArchiveClick = onToArchiveClick,
+                onToUnarchiveClick = onToUnarchiveClick,
+
+                state = state,
+                onEvent = onEvent,
+            )
+
+            if (state.thing != null){
+                val imageKey = state.thing.imagePath
+
+                AnimatedContent(
+                    targetState = imageKey,
+                    modifier = Modifier.defaultMinSize(200.dp, 200.dp),
+                    contentAlignment = Alignment.Center,
+                ) { imagePath ->
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(imagePath)
+                            .build(),
+                        contentDescription = "icon",
+                        contentScale = ContentScale.Inside,
+                    )
+                }
                 Column (modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentSize(Alignment.Center),
@@ -140,6 +173,7 @@ fun ScrollThingSurface (
                                 modifier = Modifier
                                     .height(40.dp)
                             )
+
                         }else{
                             Box(
                                 modifier = Modifier

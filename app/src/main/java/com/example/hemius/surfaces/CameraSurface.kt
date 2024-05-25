@@ -2,8 +2,11 @@ package com.example.hemius.surfaces
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color.toArgb
 import android.graphics.Matrix
+import android.media.Image
+import android.net.Uri
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
@@ -17,6 +20,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,8 +44,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -55,10 +61,13 @@ import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.math.min
+
+
 
 @Composable
 fun CameraSurface(
@@ -69,6 +78,7 @@ fun CameraSurface(
     state: ThingState,
     onEvent: (ThingEvent) -> Unit,
 ) {
+
     val controller = remember {
         LifecycleCameraController(applicationContext).apply {
             setEnabledUseCases(
@@ -106,6 +116,8 @@ fun CameraSurface(
                             .wrapContentHeight()
                             .clickable(onClick = {
                                 mainScope.launch {
+
+
                                     isProcessing = true
                                     takePhoto(
                                         controller = controller,
@@ -177,6 +189,7 @@ private fun takePhoto(
         ContextCompat.getMainExecutor(applicationContext),
         object : ImageCapture.OnImageCapturedCallback() {
             @OptIn(ExperimentalGetImage::class) override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                controller.unbind()
                 super.onCaptureSuccess(imageProxy)
 
                 val mediaImage = imageProxy.image
@@ -187,7 +200,6 @@ private fun takePhoto(
                             .enableForegroundBitmap()
                         .build()
                     val segmenter = SubjectSegmentation.getClient(options)
-
 
                     segmenter.process(inputImage)
                         .addOnSuccessListener { result ->
@@ -242,6 +254,7 @@ fun CameraPreview(
     modifier: Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+
     AndroidView(
         factory = {
             PreviewView(it).apply {

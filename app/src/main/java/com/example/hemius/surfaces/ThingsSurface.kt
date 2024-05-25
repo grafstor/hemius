@@ -9,16 +9,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,10 +26,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.hemius.R
+
 import com.example.hemius.components.ThingBox
 import com.example.hemius.database.entities.Thing
 import com.example.hemius.database.events.ThingEvent
@@ -81,7 +79,7 @@ fun ThingsSurface (
             }
         } else {
             LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Adaptive(150.dp),
+                columns = StaggeredGridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
                 verticalItemSpacing = 0.dp,
                 contentPadding = PaddingValues(start=9.dp, top=9.dp, end=9.dp, bottom=200.dp) ,
@@ -89,15 +87,13 @@ fun ThingsSurface (
                     .background(HemiusColors.current.background)
                     .fillMaxSize()
             ) {
-                items(things, key = { it.uid }) { thing ->
-
+                itemsIndexed(items = things, key = { _, thing -> thing.uid }) { _, thing ->
                     val selectedIds = state.selectedThings.map { it.uid }
                     val isSelected = remember(selectedIds) { selectedIds.contains(thing.uid) }
 
                     ThingBox(
                         thing = thing,
                         isSelected = isSelected,
-
                         onItemClick = { onThingClick(it) },
                         onItemPress = { onEvent(ThingEvent.ToggleItemInList(it)) },
                         onEvent = onEvent

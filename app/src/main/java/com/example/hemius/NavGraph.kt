@@ -88,6 +88,10 @@ fun NavGraph(
             }
             composable("search") {
                 SearchSurface(
+                    onThingOpenClick = { navController.navigate("scrollthing")  },
+
+                    state = state,
+                    onEvent = onEvent,
                 )
             }
             composable("archive") {
@@ -162,9 +166,16 @@ fun NavGraph(
             }
             composable("scrollthing") {
                 ScrollThingSurface(
-                    onToFolderClick = { navController.navigate("folders") },
+                    onHomeClick = {
+                        navController.navigate("home"){
+                            popUpTo("home") { inclusive = true }
+                        }
+                    },
+
+                    onToFolderClick = { navController.navigate("addtofolder") },
                     onDeleteClick = { onEvent(ThingEvent.DeleteSelected) },
                     onToArchiveClick = { onEvent(ThingEvent.ArchiveSelected) },
+                    onToUnarchiveClick = { onEvent(ThingEvent.UnarchiveSelected) },
 
                     state = state,
                     onEvent = onEvent,

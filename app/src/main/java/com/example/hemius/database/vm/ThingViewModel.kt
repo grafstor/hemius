@@ -52,6 +52,43 @@ class ThingViewModel(
             }
         }
     }
+    private val _state = MutableStateFlow(ThingState())
+
+    private val _things = _state.flatMapLatest { state ->
+        val thingsFlow = if (state.selectedFolderId == ALL_FOLDERS_ID) {
+            dao.getAllThings(state.archivedFilter)
+        } else {
+            if (state.archivedFilter){
+                dao.getAllThings(state.archivedFilter)
+            }else {
+                dao.getThingsByFolder(state.selectedFolderId)
+            }
+        }
+
+        thingsFlow.map { things ->
+            if (state.search.isEmpty()) {
+                things
+            } else {
+                things.filter {
+                    it.name?.contains(state.search, ignoreCase = true) == true ||
+                            it.description?.contains(state.search, ignoreCase = true) == true
+                }
+            }
+        }
+    }
+
+    private val _folders = folderDao.getAllFoldersWithImages()
+
+    val state = combine(_state, _things, _folders) { state, things, foldersWithImages ->
+        val folderMap = foldersWithImages.groupBy { it.folderId }.mapValues { entry ->
+            entry.value.first().folderName to entry.value.mapNotNull { it.imagePath }
+        }
+        state.copy(
+            things = things,
+            folders = folderMap.map { Folder(it.key, it.value.first) to it.value.second }
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ThingState())
+
     fun saveImageToDevice(bitmap: Bitmap?): String? {
         if (bitmap == null) return null
 
@@ -71,33 +108,15 @@ class ThingViewModel(
             null
         }
     }
-
-    private val _state = MutableStateFlow(ThingState())
-    private val _things = _state.flatMapLatest { state ->
-        if (state.selectedFolderId == ALL_FOLDERS_ID) {
-            dao.getAllThings(state.archivedFilter)
-        } else {
-            if (state.archivedFilter){
-                dao.getAllThings(state.archivedFilter)
-            }else {
-                dao.getThingsByFolder(state.selectedFolderId)
-            }
-        }
-    }
-    private val _folders = folderDao.getAllFoldersWithImages()
-
-    val state = combine(_state, _things, _folders) { state, things, foldersWithImages ->
-        val folderMap = foldersWithImages.groupBy { it.folderId }.mapValues { entry ->
-            entry.value.first().folderName to entry.value.mapNotNull { it.imagePath }
-        }
-        state.copy(
-            things = things,
-            folders = folderMap.map { Folder(it.key, it.value.first) to it.value.second }
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ThingState())
-
     fun onEvent(event: ThingEvent){
         when (event) {
+            is ThingEvent.SetSearch -> {
+                _state.update {
+                    it.copy(
+                        search = event.search
+                    )
+                }
+            }
             is ThingEvent.SetName -> {
                 _state.update {
                     it.copy(
@@ -105,7 +124,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.SetDescription -> {
                 _state.update {
                     it.copy(
@@ -113,7 +131,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.SetFolderName -> {
                 _state.update {
                     it.copy(
@@ -121,7 +138,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.Save -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     val name = state.value.name
@@ -149,7 +165,6 @@ class ThingViewModel(
                     }
                 }
             }
-
             is ThingEvent.SetImage -> {
                 _state.update {
                     it.copy(
@@ -157,9 +172,6 @@ class ThingViewModel(
                     )
                 }
             }
-
-
-
             is ThingEvent.DeleteFromFolderSelected -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.value.selectedThings.forEach { thing ->
@@ -189,7 +201,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.DeleteSelected -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.value.selectedThings.forEach { thing ->
@@ -204,6 +215,20 @@ class ThingViewModel(
                 }
             }
 
+            is ThingEvent.UnarchiveSelected -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _state.value.selectedThings.forEach { thing ->
+                        val updatedThing = thing.copy(isArchived = false)
+                        dao.upsert(updatedThing)
+                    }
+                    _state.update {
+                        it.copy(
+                            selectedThings = emptyList(),
+                            isThingSelected = false
+                        )
+                    }
+                }
+            }
             is ThingEvent.ToggleItemInList -> {
                 if (_state.value.selectedThings.contains(event.thing)) {
                     onEvent(ThingEvent.DeselectThing(event.thing))
@@ -211,7 +236,6 @@ class ThingViewModel(
                     onEvent(ThingEvent.SelectThing(event.thing))
                 }
             }
-
             is ThingEvent.SelectThing -> {
                 val newSelectedThings = _state.value.selectedThings.toMutableList().apply {
                     add(event.thing)
@@ -223,7 +247,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.DeselectThing -> {
                 val newSelectedThings = _state.value.selectedThings.toMutableList().apply {
                     remove(event.thing)
@@ -235,7 +258,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.SaveSelected -> {
                 _state.update {
                     it.copy(
@@ -243,7 +265,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.DeselectSelected -> {
                 _state.update {
                     it.copy(
@@ -252,7 +273,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.OpenThing -> {
                 _state.update {
                     it.copy(
@@ -260,11 +280,9 @@ class ThingViewModel(
                     )
                 }
             }
-    
             is ThingEvent.SelectFolder -> {
                 _state.update { it.copy(selectedFolderId = event.folderId) }
             }
-
             is ThingEvent.ToggleFolderCreation -> {
                 _state.update {
                     it.copy(
@@ -272,7 +290,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.SaveFolder -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     val name = state.value.folderName
@@ -292,7 +309,6 @@ class ThingViewModel(
                     }
                 }
             }
-
             is ThingEvent.ToggleToFolderMoving -> {
                 _state.update {
                     it.copy(
@@ -300,7 +316,6 @@ class ThingViewModel(
                     )
                 }
             }
-
             is ThingEvent.ToFolderSelected -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.value.moveableThings.forEach { thing ->
@@ -322,7 +337,6 @@ class ThingViewModel(
                     }
                 }
             }
-
             is ThingEvent.ToggleDarkTheme -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.update {
@@ -333,9 +347,7 @@ class ThingViewModel(
                     settingsDao.upsert(Settings(isDarkTheme = event.isDarkTheme))
                 }
             }
-
             else -> {}
-
         }
     }
 

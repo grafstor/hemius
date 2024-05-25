@@ -16,13 +16,14 @@ import com.example.hemius.ui.theme.HemiusColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HemiusTextField(
+    modifier : Modifier = Modifier,
     value:String,
     onValueChange:(String) -> Unit,
     placeholder: @Composable() (() -> Unit)? = null,
-    textStyle: TextStyle = LocalTextStyle.current
+    textStyle: TextStyle = LocalTextStyle.current,
 ){
     OutlinedTextField(
-        modifier = Modifier
+        modifier = modifier
             .background(HemiusColors.current.background)
 //            .padding(19.5.dp)
         ,

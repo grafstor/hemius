@@ -32,39 +32,15 @@ import java.io.IOException
 
 
 class MainActivity : ComponentActivity() {
-
-//    private val db by lazy {
-//        Room.databaseBuilder(
-//            applicationContext,
-//            HemiusDatabase::class.java,
-//            "hemius.db"
-//        )
-////            .allowMainThreadQueries()
-//            .fallbackToDestructiveMigration()
-//            .build()
-//    }
-//
-//    private val viewModel by viewModels<ThingViewModel>(
-//        factoryProducer = {
-//            object : ViewModelProvider.Factory {
-//                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//                    return ThingViewModel(db.thingDao, db.folderDao, db.settingsDao) as T
-//                }
-//            }
-//        }
-//    )
-
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
             HemiusDatabase::class.java,
             "hemius.db"
         )
-//            .allowMainThreadQueries() // Avoid allowing main thread queries
             .fallbackToDestructiveMigration()
             .build()
     }
-
     private val viewModel by viewModels<ThingViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
@@ -74,25 +50,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
-
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        if (!hasRequiredPermissions()) {
-//            ActivityCompat.requestPermissions(
-//                this, CAMERAX_PERMISSIONS, 0
-//            )
-//        }
-//        setContent {
-//            val state by viewModel.state.collectAsState()
-//            val onEvent = viewModel::onEvent
-//            HemiusApp(
-//                state=state,
-//                onEvent = onEvent,
-//                finishActivity = { finish() },
-//                applicationContext=applicationContext
-//            )
-//        }
-//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!hasRequiredPermissions()) {
@@ -111,7 +68,6 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-
     private fun hasRequiredPermissions(): Boolean {
         return CAMERAX_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(
@@ -120,7 +76,6 @@ class MainActivity : ComponentActivity() {
             ) == PackageManager.PERMISSION_GRANTED
         }
     }
-
     companion object {
         private val CAMERAX_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,

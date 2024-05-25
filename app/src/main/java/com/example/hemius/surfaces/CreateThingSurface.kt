@@ -38,7 +38,6 @@ import com.example.hemius.database.events.ThingEvent
 import com.example.hemius.database.states.ThingState
 import com.example.hemius.ui.theme.HemiusColors
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateThingSurface(
     onBackClick : () -> Unit,

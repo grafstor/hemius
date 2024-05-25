@@ -3,6 +3,7 @@
 package com.example.hemius.components
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -12,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -24,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +51,7 @@ import com.example.hemius.database.states.ThingState
 import com.example.hemius.ui.theme.HemiusColors
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -56,7 +60,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-
 
 @Composable
 fun ThingBox (
@@ -90,11 +93,13 @@ fun ThingBox (
                 .data(thing.imagePath)
                 .crossfade(true)
                 .build(),
+
             contentDescription = null,
             contentScale = ContentScale.Inside,
             modifier = Modifier
                 .padding(start = 9.dp, top = 9.dp, end = 9.dp),
         )
+
         Text(
             modifier = Modifier
                 .padding(start = 9.dp, top = 3.dp, end = 9.dp, bottom = 3.dp)

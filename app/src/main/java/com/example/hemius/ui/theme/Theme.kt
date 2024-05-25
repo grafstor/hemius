@@ -1,6 +1,7 @@
 package com.example.hemius.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -9,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.example.hemius.database.events.ThingEvent
 import com.example.hemius.database.states.ThingState
 
@@ -102,4 +104,12 @@ fun HemiusTheme(
             content = content
         )
     }
+}
+
+internal object MenuTokens {
+    // Изменение формы контейнера
+    val ContainerShape = RoundedCornerShape(26.dp) // например, радиус 16.dp
+
+    // Изменение высоты тени
+    val ContainerElevation = 0.dp // например, высота тени 4.dp
 }
